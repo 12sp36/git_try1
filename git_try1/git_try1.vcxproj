@@ -18,6 +18,19 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="GreatCircleDist.cpp" />
+    <ClCompile Include="iGravSP.cpp" />
+    <ClCompile Include="TravelTimes.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GreatCircle.h" />
+    <ClInclude Include="Traveltimes.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="traveltime30KM.txt" />
+    <Text Include="wcity.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{F7E1AAEB-67CE-4C2B-93F3-9901F36D8AC4}</ProjectGuid>
@@ -77,6 +90,9 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -114,8 +130,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
