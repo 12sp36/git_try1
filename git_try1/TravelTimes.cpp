@@ -5,6 +5,8 @@
 #include <fstream>
 #include <sstream>
 
+#include "Phasetimes.h"
+
 using namespace std;
 
 double convertdeg_tometres(double degrees)
@@ -37,15 +39,14 @@ int convertmet_todegree(double metres)
 
 string get_TravelTimes(int degrees)
 {
-	//bool found = false;
 	string error1 = "ERR1";
 	string error2 = "ERR2";
 
 	ifstream in_file;
-	in_file.open("traveltime30KM.txt");
+	in_file.open("TravelTimes0km999.txt");
 	if (in_file.fail())
 	{
-		cout << "Could not open traveltime30KM.txt" << endl;
+		cout << "Could not open TravelTimes0km999.txt" << endl;
 		return error1;
 	}
 
@@ -54,17 +55,13 @@ string get_TravelTimes(int degrees)
 
 	while (getline(in_file, line))
 	{
-		if (degrees < 10 || degrees > 99)
+		int i = 0;
+		while (!isspace(line[i]))
 		{
-			degstr = line.substr(0, 3);
+			i++;
 		}
-		else
-		{
-			degstr = line.substr(0, 2);
-
-		}
+		degstr = line.substr(0, i);
 		
-		//deg = stod(degstr);
 		ostringstream degreestrm;
 		degreestrm << degrees;
 		string degreestring = degreestrm.str();

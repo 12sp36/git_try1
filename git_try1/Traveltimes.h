@@ -1,5 +1,5 @@
-#ifndef Traveltimes
-#define Traveltimes
+#ifndef Traveltimes_H
+#define Traveltimes_H
 
 #include <string>
 

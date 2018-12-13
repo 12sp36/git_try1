@@ -21,14 +21,18 @@
   <ItemGroup>
     <ClCompile Include="GreatCircleDist.cpp" />
     <ClCompile Include="iGravSP.cpp" />
+    <ClCompile Include="Phasetimes.cpp" />
     <ClCompile Include="TravelTimes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GreatCircle.h" />
+    <ClInclude Include="phasetimes.h" />
     <ClInclude Include="Traveltimes.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="traveltime30KM.txt" />
+    <Text Include="TravelTimes0km999.txt" />
+    <Text Include="TravelTimes0kmN.txt" />
     <Text Include="wcity.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -24,6 +24,9 @@
     <ClCompile Include="TravelTimes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Phasetimes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GreatCircle.h">
@@ -32,12 +35,21 @@
     <ClInclude Include="Traveltimes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="phasetimes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="wcity.txt">
       <Filter>Source Files</Filter>
     </Text>
     <Text Include="traveltime30KM.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="TravelTimes0kmN.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="TravelTimes0km999.txt">
       <Filter>Source Files</Filter>
     </Text>
   </ItemGroup>

@@ -5,11 +5,31 @@
 #include <iomanip>
 #include <fstream>
 #include <cctype>
+#include <iterator>
+#include <algorithm>
 
 #include "GreatCircle.h"
 #include "Traveltimes.h"
+#include "Phasetimes.h"
+
 
 using namespace std;
+
+void display(Phasetimes x)
+{
+	string ph = x.get_phase();
+	int mn = x.get_mins();
+	int sc = x.get_secs();
+
+	if (mn == 999)
+	{
+		cout << "Phase: " << right << setw(7) << ph << "   --------------------------------------------" << endl;
+	}
+	else
+	{
+		cout << "Phase: " << right << setw(7) << ph << "   time: " << right << setw(10) << mn << "  minutes" << right << setw(10) << sc << "  seconds" << endl;
+	}
+}
 
 int main()
 {
@@ -177,16 +197,16 @@ int main()
 	stationline >> stationLong >> stationLat >> citystation;
 	sourceline >> sourceLong >> sourceLat >> citysource;
 
-	cout << "station: " << fixed << right << setw(12) << setprecision(2) << stationLong << "  " << stationLat << "   " << citystation << endl;
-	cout << "source: " << right << setw(13) << sourceLong << "  " << sourceLat << "   " << citysource << endl << endl;
+	cout << "station: " << fixed << right << setw(12) << setprecision(2) << stationLong << "  " << stationLat << "    " << citystation << endl;
+	cout << "source: " << right << setw(13) << sourceLong << "  " << sourceLat << "  " << citysource << endl << endl;
 
 	double centralangle = get_central(sourceLat, stationLat, sourceLong, stationLong);
 	double distancekm = get_distance(centralangle);
 	double azimuth = get_azimuth(sourceLat, stationLat, sourceLong, stationLong);
 
-	cout << right << setw(20) << "Distance in Km:  " << right << setw(19) << setprecision(2) << distancekm << "  Km" << endl;
-	cout << right << setw(20) << "Central Angle:  " << right << setw(17) << setprecision(2) << centralangle << "  rad" << endl;
-	cout << right << setw(20) << "Azimuth from station:  " << right << setw(15) << setprecision(2) << azimuth << "  degrees" << endl;
+	cout << setw(18) << "Distance in Km:  " << right << setw(19) << setprecision(2) << distancekm << "  Km" << endl;
+	cout << setw(18) << "Central Angle:  " << right << setw(17) << setprecision(2) << centralangle << "  rad" << endl;
+	cout << setw(18) << "Azimuth from station:  " << right << setw(15) << setprecision(2) << azimuth << "  degrees" << endl << endl;
 
 	double distmetres = convertkm_tomet(distancekm);
 	int distdegree = convertmet_todegree(distmetres);
@@ -200,17 +220,53 @@ int main()
 		return -2;
 	}
 
-	istringstream strm;
+	stringstream strm;
+	istringstream strmvalues;
+	string P = "P", PP = "PP", PcP = "PcP", PKPab = "PKPab", PKPbc = "PKPbc", PKPdf = "PKPsf", S = "S", SS = "SS", ScS = "ScS", SKSac = "SKSac", SKSdf = "SKSdf";
+
 	int distdeg;
-	int Ptime, Stime, SPdiff;
+	int Pmin, PPmin, PcPmin, PKPabmin, PKPbcmin, PKPdfmin, Smin, SSmin, ScSmin, SKSacmin, SKSdfmin, SPDIFFmin, Psec, PPsec, PcPsec, PKPabsec, PKPbcsec, PKPdfsec, Ssec, SSsec, ScSsec, SKSacsec, SKSdfsec, SPDIFFsec;
+	
 	strm.str(traveltimedata);
+	
+	strm >> distdeg >> Pmin >> Psec >> PPmin >> PPsec >> PcPmin >> PcPsec >> PKPabmin >> PKPabsec >> PKPbcmin >> PKPbcsec >> PKPdfmin >> PKPdfsec >> Smin >> Ssec >> SSmin >> SSsec >> ScSmin >> ScSsec >> SKSacmin >> SKSacsec >> SKSdfmin >> SKSdfsec;
 
-	strm >> distdeg >> Ptime >> Stime >> SPdiff;
+	SPDIFFmin = Smin - Pmin;
+	SPDIFFsec = Ssec - Psec;
 
-	cout << "Distance in Degrees:  " << right << setw(9) << distdeg << " degrees" << endl;
-	cout << "P wave travel time: " << right << setw(10) << Ptime << "  minutes" << endl;
-	cout << "S wave travel time: " << right << setw(10) << Stime << "  minutes" << endl;
-	cout << "S - P time: " << right << setw(18) << SPdiff << "  minutes" << endl;
+	Phasetimes Pw;
+	Pw.add_phasetime(P, Pmin, Psec);
+	display(Pw);
+	Phasetimes PPw;
+	PPw.add_phasetime(PP, PPmin, PPsec);
+	display(PPw);
+	Phasetimes PcPw;
+	PcPw.add_phasetime(PcP, PcPmin, PcPsec);
+	display(PcPw);
+	Phasetimes PKPabw;
+	PKPabw.add_phasetime(PKPab, PKPabmin, PKPabsec);
+	display(PKPabw);
+	Phasetimes PKPbcw;
+	PKPbcw.add_phasetime(PKPbc, PKPbcmin, PKPbcsec);
+	display(PKPbcw);
+	Phasetimes PKPdfw;
+	PKPdfw.add_phasetime(PKPdf, PKPdfmin, PKPdfsec);
+	display(PKPdfw);
+	Phasetimes Sw;
+	Sw.add_phasetime(S, Smin, Ssec);
+	display(Sw);
+	Phasetimes SSw;
+	SSw.add_phasetime(SS, SSmin, SSsec);
+	display(SSw);
+	Phasetimes ScSw;
+	ScSw.add_phasetime(ScS, ScSmin, ScSsec);
+	display(ScSw);
+	Phasetimes SKSacw;
+	SKSacw.add_phasetime(SKSac, SKSacmin, SKSacsec);
+	display(SKSacw);
+	Phasetimes SKSdfw;
+	SKSdfw.add_phasetime(SKSdf, SKSdfmin, SKSdfsec);
+	display(SKSdfw);
 
 	return 0;
 }

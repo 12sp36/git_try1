@@ -1,5 +1,5 @@
-#ifndef GreatCircleDist
-#define GreatCircleDist
+#ifndef GreatCircleDist_H
+#define GreatCircleDist_H
 
 //converts decimal degrees to radians
 double convert_torad(double decdegrees);
