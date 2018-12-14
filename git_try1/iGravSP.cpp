@@ -18,8 +18,14 @@ using namespace std;
 int srctimeMIN, srctimeSEC, srctimeHR;
 
 //display phase and time results to user
-void display(Phasetimes x, bool a)
+void display(Phasetimes x, bool a, double stationLong)
 {
+	int offset = x.get_UTCoffset(stationLong);
+	if (offset == 999)
+	{
+		cout << "Error: UTC offset returned invalid value.";
+		return;
+	}
 	string arrivaltime;
 	string ph = x.get_phase();
 	int mn = x.get_mins();
@@ -27,11 +33,11 @@ void display(Phasetimes x, bool a)
 
 	if (a == true)
 	{
-		 arrivaltime = x.get_arrival(srctimeHR, srctimeMIN, srctimeSEC, mn, sc);
+		 arrivaltime = x.get_arrival(srctimeHR, srctimeMIN, srctimeSEC, mn, sc, offset);
 	}
 	else
 	{
-		arrivaltime = "X";
+		arrivaltime = "N/A";
 	}
 	
 	//check for no data or partial data entries
@@ -41,11 +47,11 @@ void display(Phasetimes x, bool a)
 	}
 	if (mn == 999 && sc == 0)
 	{
-		cout << right << setw(7) << ph << "     ------------------------------------------------" << endl;
+		cout << right << setw(7) << ph << "     --------------------------------------------------" << endl;
 	}
 	else
 	{
-		cout << right << setw(7) << ph << right << setw(7) << mn << "  minutes" << right << setw(7) << sc << "  seconds" << right << setw(13) << arrivaltime << endl;
+		cout << right << setw(7) << ph << right << setw(7) << mn << "  minutes" << right << setw(7) << sc << "  seconds" << right << setw(18) << arrivaltime << endl;
 	}
 }
 
@@ -210,41 +216,34 @@ int main()
 	}
 
 	string srctimestrHRS, srctimestrMIN, srctimestrSEC;
+
+	//track choice to enter time of event or not
 	bool UTC = false;
 
-	if (is_Dirk)
+	string YN;
+	string srctimestr;
+	cout << "Enter time of event (UTC)?   Y/N: " << endl;
+	cin >> YN;
+	if (YN == "Y" || YN == "y")
 	{
-		string YN;
-		string srctimestr;
-		cout << "Enter time of event (UTC)?   Y/N: " << endl;
-		cin >> YN;
-		if (YN == "Y" || YN == "y")
+		UTC = true;
+		do
 		{
-			UTC = true;
-			do
+			cout << "Enter UTC time of source event (ex: ""00:07:56"" or ""21:45:09""):  ";
+			cin >> srctimestr;
+			if (srctimestr.size() != 8)
 			{
-				cout << "Enter UTC time of source event (ex: ""00:07:56"" or ""21:45:09""):  ";
-				cin >> srctimestr;
-				if (srctimestr.size() != 8)
-				{
-					cout << "Invalid time input, try again." << endl;
-				}
-
-			} while (srctimestr.size() != 8);
-			
-			srctimestrHRS = srctimestr.substr(0, 2);
-			srctimestrMIN = srctimestr.substr(3, 2);
-			srctimestrSEC = srctimestr.substr(6, 2);
-			srctimeHR = stoi(srctimestrHRS);
-			srctimeMIN = stoi(srctimestrMIN);
-			srctimeSEC = stoi(srctimestrSEC);
-		}
-		//else
-		//{
-		//	srctimeHR = 0;
-		//	srctimeMIN = 0;
-		//	srctimeSEC = 0;
-		//}
+				cout << "Invalid time input, try again." << endl;
+			}
+	
+		} while (srctimestr.size() != 8);
+		
+		srctimestrHRS = srctimestr.substr(0, 2);
+		srctimestrMIN = srctimestr.substr(3, 2);
+		srctimestrSEC = srctimestr.substr(6, 2);
+		srctimeHR = stoi(srctimestrHRS);
+		srctimeMIN = stoi(srctimestrMIN);
+		srctimeSEC = stoi(srctimestrSEC);
 	}
 	
 	//Calculate angle, distance, and azimuth
@@ -292,46 +291,43 @@ int main()
 
 	// S - P calculation
 	SPDIFFmin = Smin - Pmin;
-	SPDIFFsec = Ssec - Psec;
+	SPDIFFsec = Ssec + (60 - Psec);
 	
-	cout << right << setw(7) << "PHASE" << right << setw(25) << " TRAVEL TIME" << right << setw(28) << "ARRIVAL TIME (EST)" << endl << endl;
+	cout << right << setw(7) << "PHASE" << right << setw(25) << " TRAVEL TIME" << right << setw(30) << "ARRIVAL TIME (LOCAL)" << endl << endl;
 
 	Phasetimes Pw;
 	Pw.add_phasetime(P, Pmin, Psec);
-	display(Pw, UTC);
+	display(Pw, UTC, stationLong);
 	Phasetimes PPw;
 	PPw.add_phasetime(PP, PPmin, PPsec);
-	display(PPw, UTC);
+	display(PPw, UTC, stationLong);
 	Phasetimes PcPw;
 	PcPw.add_phasetime(PcP, PcPmin, PcPsec);
-	display(PcPw, UTC);
+	display(PcPw, UTC, stationLong);
 	Phasetimes PKPabw;
 	PKPabw.add_phasetime(PKPab, PKPabmin, PKPabsec);
-	display(PKPabw, UTC);
+	display(PKPabw, UTC, stationLong);
 	Phasetimes PKPbcw;
 	PKPbcw.add_phasetime(PKPbc, PKPbcmin, PKPbcsec);
-	display(PKPbcw, UTC);
+	display(PKPbcw, UTC, stationLong);
 	Phasetimes PKPdfw;
 	PKPdfw.add_phasetime(PKPdf, PKPdfmin, PKPdfsec);
-	display(PKPdfw, UTC);
+	display(PKPdfw, UTC, stationLong);
 	Phasetimes Sw;
 	Sw.add_phasetime(S, Smin, Ssec);
-	display(Sw, UTC);
+	display(Sw, UTC, stationLong);
 	Phasetimes SSw;
 	SSw.add_phasetime(SS, SSmin, SSsec);
-	display(SSw, UTC);
+	display(SSw, UTC, stationLong);
 	Phasetimes ScSw;
 	ScSw.add_phasetime(ScS, ScSmin, ScSsec);
-	display(ScSw, UTC);
+	display(ScSw, UTC, stationLong);
 	Phasetimes SKSacw;
 	SKSacw.add_phasetime(SKSac, SKSacmin, SKSacsec);
-	display(SKSacw, UTC);
+	display(SKSacw, UTC, stationLong);
 	Phasetimes SKSdfw;
 	SKSdfw.add_phasetime(SKSdf, SKSdfmin, SKSdfsec);
-	display(SKSdfw, UTC);
-
-	
-
+	display(SKSdfw, UTC, stationLong);
 
 	cout << right << setw(7) << "S - P" << right << setw(7) << SPDIFFmin << "  minutes" << right << setw(7) << SPDIFFsec << "  seconds" << endl;
 	cout << right << setw(7) << "Surface" << right << setw(7) << SURFmin << "  minutes" << right << setw(7) << SURFsec << "  seconds" << endl;

@@ -14,12 +14,16 @@ void Phasetimes::add_phasetime(string iphase, int iminutes, int iseconds)
 	seconds = iseconds;
 }
 
-string Phasetimes::get_arrival(int eventhrs, int eventmins, int eventsecs, int travelmins, int travelsecs)
+string Phasetimes::get_arrival(int eventhrs, int eventmins, int eventsecs, int travelmins, int travelsecs, int offset)
 {
-	int arrivalhrs = eventhrs;
+	int arrivalhrs = eventhrs + offset;
 	int arrivalmins = eventmins + travelmins;
 	int arrivalsecs = eventsecs + travelsecs;
 
+	if (arrivalhrs < 0)
+	{
+		arrivalhrs = (24 + arrivalhrs);
+	}
 	if (arrivalmins > 60)
 	{
 		arrivalhrs++;
@@ -42,18 +46,17 @@ string Phasetimes::get_arrival(int eventhrs, int eventmins, int eventsecs, int t
 	string zero = "0";
 
 	//store arrival hours, mins, secs
-	if (arrivalhrs == 0)
+	hrsstr = (to_string(arrivalhrs)).append(":");
+	if (hrsstr.length() < 3)
 	{
-		hrsstr = "00:";
-	}
-	else
-	{
-		hrsstr = (to_string(arrivalhrs)).append(":");
+		hrsstr = zero.append(hrsstr);
+		zero = "0";
 	}
 	minsstr = (to_string(arrivalmins)).append(":");
 	if (minsstr.length() < 3)
 	{
 		minsstr = zero.append(minsstr);
+		zero = "0";
 	}
 	secsstr = to_string(arrivalsecs);
 	if (secsstr.length() < 2)
@@ -61,10 +64,119 @@ string Phasetimes::get_arrival(int eventhrs, int eventmins, int eventsecs, int t
 		secsstr = zero.append(secsstr);
 	}
 	
-
 	arrivaltime = (hrsstr.append(minsstr)).append(secsstr);
 
 	return arrivaltime;
+}
+
+int Phasetimes::get_UTCoffset(double longstation)
+{
+	int offset;
+	if (longstation < -172.50 && longstation > -180.00)
+	{
+		offset = -12;
+	}
+	else if (longstation < -157.50)
+	{
+		offset = -11;
+	}
+	else if (longstation < -142.50)
+	{
+		offset = -10;
+	}
+	else if (longstation < -127.5)
+	{
+		offset = -9;
+	}
+	else if (longstation < -112.50)
+	{
+		offset = -8;
+	}
+	else if (longstation < -97.50)
+	{
+		offset = -7;
+	}
+	else if (longstation < -82.50)
+	{
+		offset = -6;
+	}
+	else if (longstation < -67.50)
+	{
+		offset = -5;
+	}
+	else if (longstation < -52.50)
+	{
+		offset = -4;
+	}
+	else if (longstation < -37.50)
+	{
+		offset = -3;
+	}
+	else if (longstation < -22.50)
+	{
+		offset = -2;
+	}
+	else if (longstation < -7.50)
+	{
+		offset = -1;
+	}
+	else if (longstation < 7.50)
+	{
+		offset = 0;
+	}
+	else if (longstation < 22.50)
+	{
+		offset = 1;
+	}
+	else if (longstation < 37.50)
+	{
+		offset = 2;
+	}
+	else if (longstation < 52.50)
+	{
+		offset = 3;
+	}
+	else if (longstation < 67.50)
+	{
+		offset = 4;
+	}
+	else if (longstation < 82.50)
+	{
+		offset = 5;
+	}
+	else if (longstation < 97.50)
+	{
+		offset = 6;
+	}
+	else if (longstation < 112.50)
+	{
+		offset = 7;
+	}
+	else if (longstation < 127.50)
+	{
+		offset = 8;
+	}
+	else if (longstation < 142.50)
+	{
+		offset = 9;
+	}
+	else if (longstation < 157.50)
+	{
+		offset = 10;
+	}
+	else if (longstation < 172.50)
+	{
+		offset = 11;
+	}
+	else if (longstation < 180.00)
+	{
+		offset = 12;
+	}
+	else
+	{
+		offset = 999;
+	}
+	return offset;
 }
 
 string Phasetimes::get_phase() const
@@ -81,4 +193,6 @@ int Phasetimes::get_secs() const
 {
 	return seconds;
 }
+
+
 

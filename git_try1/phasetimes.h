@@ -18,7 +18,9 @@ public:
 	void add_phasetime(string iphase, int iminutes, int iseconds);
 
 	//takes UTC times and travel times as input, returns arrival time as a string
-	string get_arrival(int eventhrs, int eventmins, int eventsecs, int travelmins, int travelsecs);
+	string get_arrival(int eventhrs, int eventmins, int eventsecs, int travelmins, int travelsecs, int offset);
+
+	int get_UTCoffset(double longstation);
 
 	//gets phase name
 	string get_phase() const;
