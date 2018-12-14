@@ -25,4 +25,7 @@ bool doub_is_equal(double a, double b, double epsilon = 0.001);
 //calculates the azimuth from the station to the source location
 double get_azimuth(double latsource, double latstation, double longsource, double longstation);
 
+//returns true if a >= b
+bool doub_is_greater(double a, double b, double epsilon = 0.001);
+
 #endif

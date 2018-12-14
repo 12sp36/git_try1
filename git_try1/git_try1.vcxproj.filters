@@ -38,6 +38,9 @@
     <ClInclude Include="phasetimes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="iGravSP.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="wcity.txt">

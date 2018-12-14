@@ -26,7 +26,7 @@ int convertmet_todegree(double metres)
 		degrees = floor(((2 * degrees) + 0.5) / 2);
 		return degrees;
 	}
-	else if (degrees >= 10 && degrees <= 106)
+	else if (degrees >= 10 && degrees <= 180)
 	{
 		degrees = nearbyint(degrees);
 		return degrees;
@@ -73,6 +73,10 @@ string get_TravelTimes(int degrees)
 			
 		}	
 	}
-	cout << "Could not find a match" << endl;
+	cout << "Could not find a match for this distance." << endl;
 	return error2;
 }
+
+
+
+

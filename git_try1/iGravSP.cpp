@@ -11,23 +11,41 @@
 #include "GreatCircle.h"
 #include "Traveltimes.h"
 #include "Phasetimes.h"
-
+#include "iGravSP.h"
 
 using namespace std;
 
-void display(Phasetimes x)
+int srctimeMIN, srctimeSEC, srctimeHR;
+
+//display phase and time results to user
+void display(Phasetimes x, bool a)
 {
+	string arrivaltime;
 	string ph = x.get_phase();
 	int mn = x.get_mins();
 	int sc = x.get_secs();
 
-	if (mn == 999)
+	if (a == true)
 	{
-		cout << "Phase: " << right << setw(7) << ph << "   --------------------------------------------" << endl;
+		 arrivaltime = x.get_arrival(srctimeHR, srctimeMIN, srctimeSEC, mn, sc);
 	}
 	else
 	{
-		cout << "Phase: " << right << setw(7) << ph << "   time: " << right << setw(10) << mn << "  minutes" << right << setw(10) << sc << "  seconds" << endl;
+		arrivaltime = "X";
+	}
+	
+	//check for no data or partial data entries
+	if (sc == 999)
+	{
+		sc = 0;
+	}
+	if (mn == 999 && sc == 0)
+	{
+		cout << right << setw(7) << ph << "     ------------------------------------------------" << endl;
+	}
+	else
+	{
+		cout << right << setw(7) << ph << right << setw(7) << mn << "  minutes" << right << setw(7) << sc << "  seconds" << right << setw(13) << arrivaltime << endl;
 	}
 }
 
@@ -71,7 +89,6 @@ int main()
 	string longsrcin;
 	string latsrcin;
 
-	
 	if (input == 1)
 	{
 		cout << endl << "Enter city STATION name using underscore chars for spaces (ex: ""Salt_Lake_City"" or ""St._Louis""): ";
@@ -95,19 +112,32 @@ int main()
 		cout << endl << "Source Long/Lat:  " << longsrcin << " / " << latsrcin << endl << endl;
 	}
 
-	while (getline(in_file, line)) 
-	{	
-		if (statfound == false || srcfound == false)
+	double stationLat;
+	double stationLong;
+	double sourceLat;
+	double sourceLong;
+
+	//check if station location is @ Queen's iGrav
+	bool is_Dirk = false;
+
+	//search by City
+	if (input == 1)
+	{
+		
+		if (citystatin == "Kingston")
 		{
-			//skip (-) if needed
-			int i = 0;
-			if (!isdigit(line[i]))
+			is_Dirk = true;
+		}
+		while (getline(in_file, line))
+		{
+			if (statfound == false || srcfound == false)
 			{
-				i++;
-			}
-			//search by City
-			if (input == 1)
-			{
+				//skip (-) if needed
+				int i = 0;
+				if (!isdigit(line[i]))
+				{
+					i++;
+				}
 				//extract city in line
 				while (!isalpha(line[i]))
 				{
@@ -119,98 +149,121 @@ int main()
 					statfound = true;
 					stationline.str(line);
 				}
-
+				//check for match
 				if (citycheck == citysrcin)
 				{
 					srcfound = true;
 					sourceline.str(line);
 				}
 			}
-			//search by lat/long
-			if (input == 2)
-			{
-				int j = i;
-				while (!isspace(line[j]))
-				{
-					j++;
-				}
-				string longneg;
-				string longvalue = line.substr(i, j - 1);
-				string longcheck;
-				
-				if (i = 1)
-				{
-					longneg = "-";
-					longneg.append(longvalue);
-					longcheck = longneg;
-				}
-				else
-				{
-					longcheck = longvalue;
-				}
-			
-				while (!isalpha(line[i]))
-				{
-					i++;
-				}
-				//if (!isdigit(line[j + 1]))
-				//{
-				//	j++;
-				//}
-				string latcheck = line.substr(j + 1, i - 2 - j);
+		}
+		if (statfound == false && srcfound == true)
+		{
+			cout << "Station city not found in database. Please try again or search by Lat/Long." << endl;
+			return 2;
+		}
+		if (srcfound == false && statfound == true)
+		{
+			cout << "Source city not found in database. Please try again or search by Lat/Long." << endl;
+			return 3;
+		}
+		if (statfound == false && srcfound == false)
+		{
+			cout << "Station and Source cities not found in database. Please try again or search by Lat/Long." << endl;
+			return 4;
+		}
 
-				double longstatindoub = stod(longstatin);
-				double latstatindoub = stod(latstatin);
-				double longsrcindoub = stod(longsrcin);
-				double latsrcindoub = stod(latsrcin);
-				double longcheckdoub = stod(longcheck);
-				double latcheckdoub = stod(latcheck);
+		string citystation;
+		string citysource;
 
-				//check if line matches station
-				bool statlongequal = doub_is_equal(longstatindoub, longcheckdoub);
-				bool statlatequal = doub_is_equal(latstatindoub, latcheckdoub);
-				if (statlongequal == true && statlatequal == true)
-				{
-					statfound = true;
-					stationline.str(line);
-				}
+		stationline >> stationLong >> stationLat >> citystation;
+		sourceline >> sourceLong >> sourceLat >> citysource;
 
-				//check if line matches source
-				bool srclongequal = doub_is_equal(longsrcindoub, longcheckdoub);
-				bool srclatequal = doub_is_equal(latsrcindoub, latcheckdoub);
-				if (srclongequal == true && srclatequal == true)
-				{
-					srcfound = true;
-					sourceline.str(line);
-				}
-			}
+		cout << "station: " << right << setw(12) << setprecision(2) << stationLong << "  " << stationLat << "    " << citystation << endl;
+		cout << "source: " << right << setw(12) << sourceLong << "  " << sourceLat << "    " << citysource << endl << endl;
+	}
+
+	//Calculate using Lat/Long
+	if (input == 2)
+	{
+		stationLong = stod(longstatin);
+		stationLat = stod(latstatin);
+		sourceLong = stod(longsrcin);
+		sourceLat = stod(latsrcin);
+		
+
+		if (stationLat < MINLAT || stationLat > MAXLAT || sourceLat < MINLAT || sourceLat > MAXLAT)
+		{
+			cout << "Latitudes must be between -90 & +90  decimal degrees.";
+			return 5;
+		}
+		if (stationLong < MINLONG || stationLong > MAXLONG || sourceLong < MINLONG || sourceLong > MAXLONG)
+		{
+			cout << "Longitudes must be between -180 & +180  decimal degrees.";
+			return 6;
+		}
+		
+		if ((doub_is_greater(stationLat, KING_MINLAT)) && !(doub_is_greater(stationLat, KING_MAXLAT)))
+		{
+			is_Dirk = true;
 		}
 	}
+
+	string srctimestrHRS, srctimestrMIN, srctimestrSEC;
+	bool UTC = false;
+
+	if (is_Dirk)
+	{
+		string YN;
+		string srctimestr;
+		cout << "Enter time of event (UTC)?   Y/N: " << endl;
+		cin >> YN;
+		if (YN == "Y" || YN == "y")
+		{
+			UTC = true;
+			do
+			{
+				cout << "Enter UTC time of source event (ex: ""00:07:56"" or ""21:45:09""):  ";
+				cin >> srctimestr;
+				if (srctimestr.size() != 8)
+				{
+					cout << "Invalid time input, try again." << endl;
+				}
+
+			} while (srctimestr.size() != 8);
+			
+			srctimestrHRS = srctimestr.substr(0, 2);
+			srctimestrMIN = srctimestr.substr(3, 2);
+			srctimestrSEC = srctimestr.substr(6, 2);
+			srctimeHR = stoi(srctimestrHRS);
+			srctimeMIN = stoi(srctimestrMIN);
+			srctimeSEC = stoi(srctimestrSEC);
+		}
+		//else
+		//{
+		//	srctimeHR = 0;
+		//	srctimeMIN = 0;
+		//	srctimeSEC = 0;
+		//}
+	}
 	
-	string citystation;
-	string citysource;
-	double stationLat;
-	double stationLong;
-	double sourceLat;
-	double sourceLong;
-
-	stationline >> stationLong >> stationLat >> citystation;
-	sourceline >> sourceLong >> sourceLat >> citysource;
-
-	cout << "station: " << fixed << right << setw(12) << setprecision(2) << stationLong << "  " << stationLat << "    " << citystation << endl;
-	cout << "source: " << right << setw(13) << sourceLong << "  " << sourceLat << "  " << citysource << endl << endl;
-
+	//Calculate angle, distance, and azimuth
 	double centralangle = get_central(sourceLat, stationLat, sourceLong, stationLong);
 	double distancekm = get_distance(centralangle);
 	double azimuth = get_azimuth(sourceLat, stationLat, sourceLong, stationLong);
 
-	cout << setw(18) << "Distance in Km:  " << right << setw(19) << setprecision(2) << distancekm << "  Km" << endl;
-	cout << setw(18) << "Central Angle:  " << right << setw(17) << setprecision(2) << centralangle << "  rad" << endl;
-	cout << setw(18) << "Azimuth from station:  " << right << setw(15) << setprecision(2) << azimuth << "  degrees" << endl << endl;
+	//print results
+	cout << "Distance in Km:  " << right << setw(17) << setprecision(2) << distancekm << " Km" << endl;
+	cout << "Central Angle:  " << right << setw(15) << setprecision(2) << centralangle << " rad" << endl;
+	cout << "Azimuth from station:  " << right << setw(10) << setprecision(2) << azimuth << " degrees" << endl << endl;
 
+	//convert values for travel time search
 	double distmetres = convertkm_tomet(distancekm);
 	int distdegree = convertmet_todegree(distmetres);
+
+	//find travel times
 	string traveltimedata = get_TravelTimes(distdegree);
+	//check for errors
 	if (traveltimedata == "ERR1")
 	{
 		return -1;
@@ -220,53 +273,67 @@ int main()
 		return -2;
 	}
 
+	//encapsulate travel time data items
 	stringstream strm;
 	istringstream strmvalues;
 	string P = "P", PP = "PP", PcP = "PcP", PKPab = "PKPab", PKPbc = "PKPbc", PKPdf = "PKPsf", S = "S", SS = "SS", ScS = "ScS", SKSac = "SKSac", SKSdf = "SKSdf";
 
 	int distdeg;
-	int Pmin, PPmin, PcPmin, PKPabmin, PKPbcmin, PKPdfmin, Smin, SSmin, ScSmin, SKSacmin, SKSdfmin, SPDIFFmin, Psec, PPsec, PcPsec, PKPabsec, PKPbcsec, PKPdfsec, Ssec, SSsec, ScSsec, SKSacsec, SKSdfsec, SPDIFFsec;
+	int Pmin, PPmin, PcPmin, PKPabmin, PKPbcmin, PKPdfmin, Smin, SSmin, ScSmin, SKSacmin, SKSdfmin, SPDIFFmin, Psec, PPsec, PcPsec, PKPabsec, PKPbcsec, PKPdfsec, Ssec, SSsec, ScSsec, SKSacsec, SKSdfsec, SURFmin, SURFsec, SPDIFFsec;
 	
+	//Surface wave calculation
+	int surftime = distmetres / SURF_VEL;
+	SURFmin = surftime / 60;
+	SURFsec = surftime % 60;
+
 	strm.str(traveltimedata);
 	
 	strm >> distdeg >> Pmin >> Psec >> PPmin >> PPsec >> PcPmin >> PcPsec >> PKPabmin >> PKPabsec >> PKPbcmin >> PKPbcsec >> PKPdfmin >> PKPdfsec >> Smin >> Ssec >> SSmin >> SSsec >> ScSmin >> ScSsec >> SKSacmin >> SKSacsec >> SKSdfmin >> SKSdfsec;
 
+	// S - P calculation
 	SPDIFFmin = Smin - Pmin;
 	SPDIFFsec = Ssec - Psec;
+	
+	cout << right << setw(7) << "PHASE" << right << setw(25) << " TRAVEL TIME" << right << setw(28) << "ARRIVAL TIME (EST)" << endl << endl;
 
 	Phasetimes Pw;
 	Pw.add_phasetime(P, Pmin, Psec);
-	display(Pw);
+	display(Pw, UTC);
 	Phasetimes PPw;
 	PPw.add_phasetime(PP, PPmin, PPsec);
-	display(PPw);
+	display(PPw, UTC);
 	Phasetimes PcPw;
 	PcPw.add_phasetime(PcP, PcPmin, PcPsec);
-	display(PcPw);
+	display(PcPw, UTC);
 	Phasetimes PKPabw;
 	PKPabw.add_phasetime(PKPab, PKPabmin, PKPabsec);
-	display(PKPabw);
+	display(PKPabw, UTC);
 	Phasetimes PKPbcw;
 	PKPbcw.add_phasetime(PKPbc, PKPbcmin, PKPbcsec);
-	display(PKPbcw);
+	display(PKPbcw, UTC);
 	Phasetimes PKPdfw;
 	PKPdfw.add_phasetime(PKPdf, PKPdfmin, PKPdfsec);
-	display(PKPdfw);
+	display(PKPdfw, UTC);
 	Phasetimes Sw;
 	Sw.add_phasetime(S, Smin, Ssec);
-	display(Sw);
+	display(Sw, UTC);
 	Phasetimes SSw;
 	SSw.add_phasetime(SS, SSmin, SSsec);
-	display(SSw);
+	display(SSw, UTC);
 	Phasetimes ScSw;
 	ScSw.add_phasetime(ScS, ScSmin, ScSsec);
-	display(ScSw);
+	display(ScSw, UTC);
 	Phasetimes SKSacw;
 	SKSacw.add_phasetime(SKSac, SKSacmin, SKSacsec);
-	display(SKSacw);
+	display(SKSacw, UTC);
 	Phasetimes SKSdfw;
 	SKSdfw.add_phasetime(SKSdf, SKSdfmin, SKSdfsec);
-	display(SKSdfw);
+	display(SKSdfw, UTC);
 
+	
+
+
+	cout << right << setw(7) << "S - P" << right << setw(7) << SPDIFFmin << "  minutes" << right << setw(7) << SPDIFFsec << "  seconds" << endl;
+	cout << right << setw(7) << "Surface" << right << setw(7) << SURFmin << "  minutes" << right << setw(7) << SURFsec << "  seconds" << endl;
 	return 0;
 }

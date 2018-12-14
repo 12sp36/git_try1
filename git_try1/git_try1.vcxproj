@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GreatCircle.h" />
+    <ClInclude Include="iGravSP.h" />
     <ClInclude Include="phasetimes.h" />
     <ClInclude Include="Traveltimes.h" />
   </ItemGroup>

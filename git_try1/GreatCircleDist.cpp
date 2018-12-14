@@ -7,7 +7,6 @@ using namespace std;
 const int RADIUS = 6371;
 const double PI = 3.141592653589793238463;
 
-//global params
 
 
 double convert_torad(double decdegrees)
@@ -60,6 +59,20 @@ bool doub_is_equal(double a, double b, double epsilon = 0.001)
 	{
 		return true;
 	}
+	else
+	{
+		return false;
+	}
+}
+
+bool doub_is_greater(double a, double b, double epsilon = 0.001)
+{
+	if (((a - b) > epsilon))
+	{
+		return true;
+	}
+	return false;
+
 }
 
 double get_azimuth(double latsource, double latstation, double longsource, double longstation)
@@ -85,7 +98,5 @@ double get_azimuth(double latsource, double latstation, double longsource, doubl
 	{
 		azimuth = azimuthdegUN;
 	}
-		
-	
 	return azimuth;
 }
