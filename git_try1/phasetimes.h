@@ -17,6 +17,9 @@ public:
 	//add parameters to phasetimes object
 	void add_phasetime(string iphase, int iminutes, int iseconds);
 
+	//calculate arrival time values for get_arrival
+	vector<int> calc_arrivals(int eventhrs, int eventmins, int eventsecs, int travelmins, int travelsecs, int offset);
+
 	//takes UTC times and travel times as input, returns arrival time as a string
 	string get_arrival(int eventhrs, int eventmins, int eventsecs, int travelmins, int travelsecs, int offset);
 

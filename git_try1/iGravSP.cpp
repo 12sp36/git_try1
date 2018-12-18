@@ -26,32 +26,31 @@ void display(Phasetimes x, bool a, double stationLong)
 		cout << "Error: UTC offset returned invalid value.";
 		return;
 	}
-	string arrivaltime;
+	string arrivaltimeLOCAL;
+	string arrivaltimeUTC;
 	string ph = x.get_phase();
 	int mn = x.get_mins();
 	int sc = x.get_secs();
 
 	if (a == true)
 	{
-		 arrivaltime = x.get_arrival(srctimeHR, srctimeMIN, srctimeSEC, mn, sc, offset);
+		 arrivaltimeLOCAL = x.get_arrival(srctimeHR, srctimeMIN, srctimeSEC, mn, sc, offset);
+		 arrivaltimeUTC = x.get_arrival(srctimeHR, srctimeMIN, srctimeSEC, mn, sc, 0);
 	}
 	else
 	{
-		arrivaltime = "N/A";
+		arrivaltimeLOCAL = "N/A";
+		arrivaltimeUTC = "N/A";
 	}
 	
 	//check for no data or partial data entries
-	if (sc == 999)
+	if (mn == 999)
 	{
-		sc = 0;
-	}
-	if (mn == 999 && sc == 0)
-	{
-		cout << right << setw(7) << ph << "     --------------------------------------------------" << endl;
+		cout << right << setw(7) << ph << "     ---------------------------------------------------------------------" << endl;
 	}
 	else
 	{
-		cout << right << setw(7) << ph << right << setw(7) << mn << "  minutes" << right << setw(7) << sc << "  seconds" << right << setw(18) << arrivaltime << endl;
+		cout << right << setw(7) << ph << right << setw(7) << mn << "  minutes" << right << setw(7) << sc << "  seconds" << right << setw(18) << arrivaltimeLOCAL << right << setw(24) << arrivaltimeUTC <<  endl;
 	}
 }
 
@@ -248,12 +247,14 @@ int main()
 	
 	//Calculate angle, distance, and azimuth
 	double centralangle = get_central(sourceLat, stationLat, sourceLong, stationLong);
+	double centraldegrees = convert_todeg(centralangle);
 	double distancekm = get_distance(centralangle);
 	double azimuth = get_azimuth(sourceLat, stationLat, sourceLong, stationLong);
 
 	//print results
-	cout << "Distance in Km:  " << right << setw(17) << setprecision(2) << distancekm << " Km" << endl;
+	cout << "Distance in km:  " << right << setw(17) << setprecision(2) << distancekm << " km" << endl;
 	cout << "Central Angle:  " << right << setw(15) << setprecision(2) << centralangle << " rad" << endl;
+	cout << "Central Angle:  " << right << setw(16) << setprecision(2) << centraldegrees << " degrees" << endl;
 	cout << "Azimuth from station:  " << right << setw(10) << setprecision(2) << azimuth << " degrees" << endl << endl;
 
 	//convert values for travel time search
@@ -275,7 +276,7 @@ int main()
 	//encapsulate travel time data items
 	stringstream strm;
 	istringstream strmvalues;
-	string P = "P", PP = "PP", PcP = "PcP", PKPab = "PKPab", PKPbc = "PKPbc", PKPdf = "PKPsf", S = "S", SS = "SS", ScS = "ScS", SKSac = "SKSac", SKSdf = "SKSdf";
+	string P = "P", PP = "PP", PcP = "PcP", PKPab = "PKPab", PKPbc = "PKPbc", PKPdf = "PKPdf", S = "S", SS = "SS", ScS = "ScS", SKSac = "SKSac", SKSdf = "SKSdf", SURF = "Surface";
 
 	int distdeg;
 	int Pmin, PPmin, PcPmin, PKPabmin, PKPbcmin, PKPdfmin, Smin, SSmin, ScSmin, SKSacmin, SKSdfmin, SPDIFFmin, Psec, PPsec, PcPsec, PKPabsec, PKPbcsec, PKPdfsec, Ssec, SSsec, ScSsec, SKSacsec, SKSdfsec, SURFmin, SURFsec, SPDIFFsec;
@@ -285,6 +286,8 @@ int main()
 	SURFmin = surftime / 60;
 	SURFsec = surftime % 60;
 
+
+
 	strm.str(traveltimedata);
 	
 	strm >> distdeg >> Pmin >> Psec >> PPmin >> PPsec >> PcPmin >> PcPsec >> PKPabmin >> PKPabsec >> PKPbcmin >> PKPbcsec >> PKPdfmin >> PKPdfsec >> Smin >> Ssec >> SSmin >> SSsec >> ScSmin >> ScSsec >> SKSacmin >> SKSacsec >> SKSdfmin >> SKSdfsec;
@@ -293,7 +296,7 @@ int main()
 	SPDIFFmin = Smin - Pmin;
 	SPDIFFsec = Ssec + (60 - Psec);
 	
-	cout << right << setw(7) << "PHASE" << right << setw(25) << " TRAVEL TIME" << right << setw(30) << "ARRIVAL TIME (LOCAL)" << endl << endl;
+	cout << right << setw(7) << "PHASE" << right << setw(25) << " TRAVEL TIME" << right << setw(30) << "ARRIVAL TIME (LOCAL)" << right << setw(25)<< "ARRIVAL TIME (UTC)" << endl << endl;
 
 	Phasetimes Pw;
 	Pw.add_phasetime(P, Pmin, Psec);
@@ -328,8 +331,9 @@ int main()
 	Phasetimes SKSdfw;
 	SKSdfw.add_phasetime(SKSdf, SKSdfmin, SKSdfsec);
 	display(SKSdfw, UTC, stationLong);
+	Phasetimes SURFw;
+	SURFw.add_phasetime(SURF, SURFmin, SURFsec);
+	display(SURFw, UTC, stationLong);
 
 	cout << right << setw(7) << "S - P" << right << setw(7) << SPDIFFmin << "  minutes" << right << setw(7) << SPDIFFsec << "  seconds" << endl;
-	cout << right << setw(7) << "Surface" << right << setw(7) << SURFmin << "  minutes" << right << setw(7) << SURFsec << "  seconds" << endl;
-	return 0;
 }

@@ -14,7 +14,7 @@ void Phasetimes::add_phasetime(string iphase, int iminutes, int iseconds)
 	seconds = iseconds;
 }
 
-string Phasetimes::get_arrival(int eventhrs, int eventmins, int eventsecs, int travelmins, int travelsecs, int offset)
+vector<int> Phasetimes::calc_arrivals(int eventhrs, int eventmins, int eventsecs, int travelmins, int travelsecs, int offset)
 {
 	int arrivalhrs = eventhrs + offset;
 	int arrivalmins = eventmins + travelmins;
@@ -38,6 +38,21 @@ string Phasetimes::get_arrival(int eventhrs, int eventmins, int eventsecs, int t
 		arrivalmins++;
 		arrivalsecs = arrivalsecs % 60;
 	}
+
+	vector<int> arrivals;
+	arrivals.push_back(arrivalhrs);
+	arrivals.push_back(arrivalmins);
+	arrivals.push_back(arrivalsecs);
+	return arrivals;
+}
+
+string Phasetimes::get_arrival(int eventhrs, int eventmins, int eventsecs, int travelmins, int travelsecs, int offset)
+{
+	vector<int> arrivals = calc_arrivals(eventhrs, eventmins, eventsecs, travelmins, travelsecs, offset);
+
+	int arrivalhrs = arrivals[0];
+	int arrivalmins = arrivals[1];
+	int arrivalsecs = arrivals[2];
 
 	string arrivaltime;
 	string hrsstr;
